@@ -1,4 +1,5 @@
 const errorHandler = (err, req, res, next) => {
+	void next;
 	const statusCode = err.statusCode || 500;
 
 	if (process.env.NODE_ENV !== "test") {
