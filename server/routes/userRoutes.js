@@ -22,6 +22,7 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 import { getProductById, listProducts } from "../controllers/productsController.js";
 import {
 	getMyTransactionDetail,
+	getMyTransactionReceiptHtml,
 	getWalletBalance,
 	listMyTransactions,
 	purchaseProduct,
@@ -91,5 +92,6 @@ router.get(
 );
 
 router.get("/transactions/:id", authMiddleware, getMyTransactionDetail);
+router.get("/transactions/:id/receipt-html", authMiddleware, getMyTransactionReceiptHtml);
 
 export default router;
