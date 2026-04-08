@@ -14,14 +14,22 @@ cd server
 npm install
 ```
 
-3. Configure environment in `server/.env`:
+3. Create your environment file from example:
+```bash
+cp server/.env.example server/.env
+```
+
+4. Configure database in `server/.env`.
+
+Option A: Local PostgreSQL
 ```env
 PORT=5001
 DB_USER="postgres"
 DB_HOST="localhost"
 DB_NAME="agrodealer"
 DB_PORT=5432
-DB_PASSWORD=pasword123
+DB_PASSWORD="your_local_postgres_password"
+DB_SSL=false
 
 JWT_SECRET="dev-only-super-secret-change-me"
 OTP_TTL_MINUTES=10
@@ -29,7 +37,21 @@ DEFAULT_WALLET_BALANCE=500
 NODE_ENV="development"
 ```
 
-4. Start server:
+Option B: Neon PostgreSQL
+```env
+PORT=5001
+DATABASE_URL="postgresql://<user>:<password>@<host>/<db>?sslmode=require"
+DB_SSL=true
+
+JWT_SECRET="dev-only-super-secret-change-me"
+OTP_TTL_MINUTES=10
+DEFAULT_WALLET_BALANCE=500
+NODE_ENV="development"
+```
+
+When `DATABASE_URL` is set, the server uses it and ignores `DB_USER`, `DB_HOST`, `DB_NAME`, `DB_PORT`, `DB_PASSWORD`.
+
+5. Start server:
 ```bash
 npm run start
 ```
@@ -44,6 +66,7 @@ http://localhost:5001/api
 - Dummy OTP is returned in API responses for assignment/demo only.
 - Protected endpoints require `Authorization: Bearer <token>`.
 - All POST write operations use DB transactions where relevant.
+- Neon is supported through `DATABASE_URL` (with SSL).
 
 ## API Docs
 
