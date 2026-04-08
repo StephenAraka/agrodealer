@@ -3,7 +3,7 @@
 
 body {
   @apply bg-bg text-textBlack;
-  font-family: var(--font-sora), sans-serif;
+  font-family: var(--font-poppins), sans-serif;
 }
 
 input:focus-visible,
@@ -11,4 +11,60 @@ button:focus-visible,
 a:focus-visible {
   outline: 2px solid theme(colors.textGreen);
   outline-offset: 2px;
+}
+
+.cs-poppins-bold-15 {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.cs-poppins-semibold-16 {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #707070;
+}
+
+.cs-futura-bold-37 {
+  font-family: Futura, var(--font-poppins), sans-serif;
+  font-size: 37px;
+  font-weight: 700;
+  color: #009438;
+}
+
+.cs-poppins-medium-20 {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #707070;
+}
+
+.cs-poppins-semibold-13 {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #707070;
+}
+
+.cs-poppins-semibold-11 {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: #272935;
+}
+
+.cs-poppins-bold-13 {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #e8b40a;
+}
+
+.cs-poppins-regular-13 {
+  font-family: var(--font-poppins), sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #707070;
 }
