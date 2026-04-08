@@ -5,8 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, PlusCircle, MinusCircle } from "lucide-react";
 import { DashboardShell, PaymentSuccessModal } from "@/components/global";
 import { Button } from "@/components/shared";
-import { API_BASE_URL } from "@/lib/api/client";
-import { getProducts, getWallet, purchaseProduct } from "@/lib/api/dashboard";
+import { getProducts, getTransactionReceiptHtml, getWallet, purchaseProduct } from "@/lib/api/dashboard";
 import { getToken } from "@/lib/session";
 import { appToast } from "@/lib/toast";
 
@@ -81,7 +80,7 @@ export default function BuyProductsPage() {
     return selectedItems.reduce((sum, item) => sum + item.lineTotal, 0);
   }, [selectedItems]);
 
-  const canPay = selectedItems.length > 0 && totalCost <= walletBalance && !processing;
+  const canPay = selectedItems.length > 0 && totalCost > 0 && totalCost <= walletBalance && !processing;
 
   const increaseProduct = (productId: number) => {
     setCart((prev) => ({
@@ -110,6 +109,11 @@ export default function BuyProductsPage() {
 
     if (selectedItems.length === 0) {
       appToast.error("Please select at least one product");
+      return;
+    }
+
+    if (totalCost <= 0) {
+      appToast.error("Transaction amount must be greater than zero");
       return;
     }
 
@@ -275,10 +279,21 @@ export default function BuyProductsPage() {
         open={showSuccess}
         amount={totalCost}
         transactionIds={latestTransactionIds}
-        onDownloadReceipt={() => {
+        onDownloadReceipt={async () => {
           const firstId = latestTransactionIds[0];
           if (!firstId) return;
-          window.open(`${API_BASE_URL}/transactions/${firstId}/receipt-html`, "_blank");
+          const token = getToken();
+          if (!token) return;
+          try {
+            const html = await getTransactionReceiptHtml(token, firstId);
+            const popup = window.open("", "_blank");
+            if (!popup) return;
+            popup.document.write(html);
+            popup.document.close();
+            popup.print();
+          } catch {
+            appToast.error("Failed to load receipt");
+          }
         }}
         onClose={() => {
           setShowSuccess(false);

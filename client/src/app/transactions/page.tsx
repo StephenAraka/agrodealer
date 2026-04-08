@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { Eye } from "lucide-react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import { Eye, X } from "lucide-react";
 import { DashboardShell } from "@/components/global";
-import { getTransactions } from "@/lib/api/dashboard";
+import { Button } from "@/components/shared";
+import { getTransactions, getWallet, topupWallet } from "@/lib/api/dashboard";
 import { getToken } from "@/lib/session";
 import { appToast } from "@/lib/toast";
 
@@ -21,6 +22,25 @@ export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<TransactionRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState("all");
+  const [walletBalance, setWalletBalance] = useState<number | null>(null);
+  const [showTopup, setShowTopup] = useState(false);
+  const [topupAmount, setTopupAmount] = useState("");
+  const [topupLoading, setTopupLoading] = useState(false);
+
+  const loadData = async (token: string) => {
+    try {
+      const [txResp, walletResp] = await Promise.all([
+        getTransactions(token, 100),
+        getWallet(token),
+      ]);
+      setTransactions((txResp.data?.transactions || []) as TransactionRow[]);
+      setWalletBalance(Number(walletResp.data?.wallet?.balance ?? 0));
+    } catch (error) {
+      appToast.error(error instanceof Error ? error.message : "Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const token = getToken();
@@ -28,20 +48,33 @@ export default function TransactionsPage() {
       window.location.href = "/auth/login";
       return;
     }
-
-    const load = async () => {
-      try {
-        const response = await getTransactions(token, 100);
-        setTransactions((response.data?.transactions || []) as TransactionRow[]);
-      } catch (error) {
-        appToast.error(error instanceof Error ? error.message : "Failed to load transactions");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
+    loadData(token);
   }, []);
+
+  const handleTopup = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const amount = Number(topupAmount);
+    if (!amount || amount <= 0) {
+      appToast.error("Enter a valid amount greater than zero");
+      return;
+    }
+    const token = getToken();
+    if (!token) return;
+    setTopupLoading(true);
+    try {
+      const response = await topupWallet(token, amount);
+      setWalletBalance(Number(response.data?.balance ?? 0));
+      appToast.success(`Wallet topped up with KES ${amount.toFixed(2)}`);
+      setTopupAmount("");
+      setShowTopup(false);
+      // Reload transactions so the new top-up entry appears
+      await loadData(token);
+    } catch (error) {
+      appToast.error(error instanceof Error ? error.message : "Top-up failed");
+    } finally {
+      setTopupLoading(false);
+    }
+  };
 
   const filteredTransactions = useMemo(() => {
     if (filterType === "all") return transactions;
@@ -50,7 +83,100 @@ export default function TransactionsPage() {
 
   return (
     <DashboardShell>
-      <h1 className="text-5xl font-bold text-textBlack">Transactions</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="text-5xl font-bold text-textBlack">Transactions</h1>
+
+        <div className="flex items-center gap-4">
+          {walletBalance !== null ? (
+            <p className="text-cs-16 font-semibold text-textBlack">
+              Wallet:{" "}
+              <span className="text-textGreen">KES {walletBalance.toFixed(2)}</span>
+            </p>
+          ) : null}
+          <Button
+            type="button"
+            size="md"
+            fullWidth={false}
+            className="h-10 px-5"
+            onClick={() => setShowTopup(true)}
+            aria-label="Top up wallet"
+          >
+            + Top Up Wallet
+          </Button>
+        </div>
+      </div>
+
+      {/* Top-up modal */}
+      {showTopup ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="topup-title"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+        >
+          <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h2 id="topup-title" className="text-3xl font-bold text-textBlack">
+                Top Up Wallet
+              </h2>
+              <button
+                type="button"
+                onClick={() => { setShowTopup(false); setTopupAmount(""); }}
+                aria-label="Close top-up dialog"
+                className="rounded-full p-1 text-textGray hover:bg-gray-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {walletBalance !== null ? (
+              <p className="mt-1 text-cs-16 text-textGray">
+                Current balance:{" "}
+                <span className="font-semibold text-textBlack">KES {walletBalance.toFixed(2)}</span>
+              </p>
+            ) : null}
+
+            <form className="mt-6 space-y-5" onSubmit={handleTopup} noValidate>
+              <div>
+                <label
+                  htmlFor="topupAmount"
+                  className="block text-cs-16 font-semibold text-textBlack"
+                >
+                  Amount (KES)
+                </label>
+                <input
+                  id="topupAmount"
+                  name="topupAmount"
+                  type="number"
+                  inputMode="decimal"
+                  min="1"
+                  step="0.01"
+                  value={topupAmount}
+                  onChange={(e) => setTopupAmount(e.target.value)}
+                  placeholder="e.g. 500"
+                  required
+                  aria-required="true"
+                  className="mt-2 h-12 w-full rounded-xl border border-borderGray bg-white px-4 text-cs-16 text-textBlack focus:outline-none focus:ring-2 focus:ring-primaryYellow"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="md"
+                  onClick={() => { setShowTopup(false); setTopupAmount(""); }}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" variant="dark" size="md" disabled={topupLoading}>
+                  {topupLoading ? "Processing..." : "Top Up"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-6 max-w-225">
         <label htmlFor="serviceType" className="block text-cs-16 font-semibold text-textBlack">
