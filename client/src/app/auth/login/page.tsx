@@ -153,6 +153,9 @@ export default function LoginPage() {
                   label="Username"
                   value={username}
                   error={usernameError}
+                  placeholder="Enter your username"
+                  aria-required="true"
+                  autoComplete="username"
                   onChange={(event) => {
                     setUsername(event.target.value);
                     setUsernameError("");
@@ -173,6 +176,9 @@ export default function LoginPage() {
                       name="password"
                       type={showPassword ? "text" : "password"}
                       value={password}
+                      placeholder="Enter your password"
+                      aria-label="Password"
+                      aria-required="true"
                       onChange={(event) => {
                         setPassword(event.target.value);
                         setPasswordError("");

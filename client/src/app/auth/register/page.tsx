@@ -157,6 +157,9 @@ export default function RegisterPage() {
               label="Name"
               value={name}
               error={errors.name}
+              placeholder="e.g. John Doe"
+              aria-required="true"
+              autoComplete="name"
               onChange={(event) => {
                 setName(event.target.value);
                 setErrors((prev) => ({ ...prev, name: "" }));
@@ -169,6 +172,9 @@ export default function RegisterPage() {
               label="Username"
               value={username}
               error={errors.username}
+              placeholder="Choose a username"
+              aria-required="true"
+              autoComplete="username"
               onChange={(event) => {
                 setUsername(event.target.value);
                 setErrors((prev) => ({ ...prev, username: "" }));
@@ -183,6 +189,8 @@ export default function RegisterPage() {
               error={errors.phoneNumber}
               inputMode="tel"
               placeholder="+254700111222"
+              aria-required="true"
+              autoComplete="tel"
               onChange={(event) => {
                 setPhoneNumber(event.target.value);
                 setErrors((prev) => ({ ...prev, phoneNumber: "" }));
@@ -196,6 +204,9 @@ export default function RegisterPage() {
               type="password"
               value={password}
               error={errors.password}
+              placeholder="Create a password"
+              aria-required="true"
+              autoComplete="new-password"
               onChange={(event) => {
                 setPassword(event.target.value);
                 setErrors((prev) => ({ ...prev, password: "" }));
@@ -209,6 +220,9 @@ export default function RegisterPage() {
               type="password"
               value={confirmPassword}
               error={errors.confirmPassword}
+              placeholder="Repeat your password"
+              aria-required="true"
+              autoComplete="new-password"
               onChange={(event) => {
                 setConfirmPassword(event.target.value);
                 setErrors((prev) => ({ ...prev, confirmPassword: "" }));
@@ -237,6 +251,8 @@ export default function RegisterPage() {
               value={otpCode}
               error={errors.otpCode}
               placeholder="Enter OTP"
+              aria-required="true"
+              inputMode="numeric"
               onChange={(event) => {
                 setOtpCode(event.target.value);
                 setErrors((prev) => ({ ...prev, otpCode: "" }));

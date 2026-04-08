@@ -72,6 +72,13 @@ export const getTransactionDetails = (token: string, transactionId: string | num
     },
   );
 
+export const topupWallet = (token: string, amount: number) =>
+  apiRequest<{ balance: number }>("/wallet/topup", {
+    method: "POST",
+    token,
+    body: { amount },
+  });
+
 export const getTransactionReceiptHtml = async (token: string, transactionId: string | number) => {
   const response = await fetch(`${API_BASE_URL}/transactions/${transactionId}/receipt-html`, {
     headers: {
