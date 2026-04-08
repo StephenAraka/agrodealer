@@ -18,6 +18,20 @@ import {
 	registerSchema,
 	verifyPhoneSchema,
 } from "../validators/authValidator.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import { getProductById, listProducts } from "../controllers/productsController.js";
+import {
+	getMyTransactionDetail,
+	getWalletBalance,
+	listMyTransactions,
+	purchaseProduct,
+	topupWallet,
+} from "../controllers/transactionsController.js";
+import {
+	purchaseSchema,
+	topupSchema,
+	transactionListQuerySchema,
+} from "../validators/operationValidator.js";
 
 const router = Router();
 
@@ -55,5 +69,27 @@ router.post(
 	inputValidator(forgotPasswordResetSchema),
 	resetForgotPassword,
 );
+
+router.get("/products", listProducts);
+router.get("/products/:id", getProductById);
+
+router.get("/wallet", authMiddleware, getWalletBalance);
+router.post("/wallet/topup", authMiddleware, inputValidator(topupSchema), topupWallet);
+
+router.post(
+	"/transactions/purchase",
+	authMiddleware,
+	inputValidator(purchaseSchema),
+	purchaseProduct,
+);
+
+router.get(
+	"/transactions",
+	authMiddleware,
+	inputValidator(transactionListQuerySchema, "query"),
+	listMyTransactions,
+);
+
+router.get("/transactions/:id", authMiddleware, getMyTransactionDetail);
 
 export default router;
