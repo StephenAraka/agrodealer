@@ -61,3 +61,6 @@ See [`client/README.md`](client/README.md) for architecture details, design toke
 - **OTP delivery** — OTPs are returned in the API response for demo purposes; real deployment needs SMS integration (e.g. Africa's Talking, Twilio)
 - **Role-based access** — currently single-role; a dealer/admin split would allow back-office product and user management
 - **Offline support** — a PWA shell with cached product data would help dealers in low-connectivity environments
+- **Actual OTP** — OTP is currently generating dummy OTP codes and sending back to client, not actual SMS
+- **Testing** — I have not written tests for this application, however, this would be a priority to add
+- **Client side Responsiveness** — While we have implemented according to the style guide, the UI is a bit ugly and not mobile responsive
