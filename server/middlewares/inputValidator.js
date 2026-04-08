@@ -14,7 +14,13 @@ const inputValidator = (schema, source = "body") => {
 			});
 		}
 
-		req[source] = value;
+		// req.query and req.params are getter-only on IncomingMessage;
+		// mutate in-place instead of replacing the reference.
+		if (source === "body") {
+			req.body = value;
+		} else {
+			Object.assign(req[source], value);
+		}
 		return next();
 	};
 };
