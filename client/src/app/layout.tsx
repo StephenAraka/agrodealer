@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
-import { Sora } from "next/font/google";
+import { Poppins } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
-const sora = Sora({
-  variable: "--font-sora",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -18,8 +20,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sora.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${poppins.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3200,
+            style: {
+              borderRadius: "10px",
+              padding: "12px 14px",
+              fontSize: "14px",
+            },
+          }}
+        />
+      </body>
     </html>
   );
 }
